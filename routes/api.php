@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\PeopleApiController;
 use App\Http\Controllers\API\StudentApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,3 +16,4 @@ use App\Models\Student;
 Route::get('/test', [TestApiController::class, 'test'])->name('test-api');
 Route::apiResource('/students', StudentApiController::class);
 // Route::get('students', [StudentApiController::class, 'index']);
+Route::apiResource('/peoples', PeopleApiController::class);

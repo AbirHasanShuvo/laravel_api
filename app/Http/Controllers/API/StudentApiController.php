@@ -16,7 +16,7 @@ class StudentApiController extends Controller
      */
     public function index()
     {
-        $students = Student::where('name', 'abir')->get();
+        $students = Student::get();
         return response()->json(data: [
             "status" => "success",
             "data" => $students,
