@@ -4,7 +4,7 @@ use App\Http\Controllers\API\StudentApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\TestApiController;
-
+use App\Models\Student;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -13,4 +13,5 @@ use App\Http\Controllers\API\TestApiController;
 //first api route for testing
 
 Route::get('/test', [TestApiController::class, 'test'])->name('test-api');
-Route::resource('students', StudentApiController::class);
+Route::apiResource('/students', StudentApiController::class);
+// Route::get('students', [StudentApiController::class, 'index']);
