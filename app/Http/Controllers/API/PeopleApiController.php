@@ -58,16 +58,25 @@ class PeopleApiController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $people = People::find($id);
+
+        if ($people) {
+            return response()->json([
+                "status" => "Success",
+                "data" => $people
+            ], status: 200);
+        }
+
+        return response()->json([
+            "status" => "Failed",
+            "message" => "No user found"
+        ], status: 404);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, string $id) {}
 
     /**
      * Remove the specified resource from storage.
