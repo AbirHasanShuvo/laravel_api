@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\PeopleApiController;
 use App\Http\Controllers\API\StudentApiController;
 use Illuminate\Http\Request;
@@ -17,3 +18,6 @@ Route::get('/test', [TestApiController::class, 'test'])->name('test-api');
 Route::apiResource('/students', StudentApiController::class);
 // Route::get('students', [StudentApiController::class, 'index']);
 Route::apiResource('/peoples', PeopleApiController::class);
+
+//new routes
+Route::post('/register', [AuthController::class, 'register'])->name('register');
