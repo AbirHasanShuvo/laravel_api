@@ -21,3 +21,5 @@ Route::apiResource('/peoples', PeopleApiController::class);
 
 //new routes
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+//for login
+Route::post('/login', [AuthController::class, 'login'])->name('login');
