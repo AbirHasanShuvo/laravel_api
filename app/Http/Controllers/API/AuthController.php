@@ -30,17 +30,32 @@ class AuthController extends Controller
             ], 400);
         }
 
-        // Creating user
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // hash manually
-        ]);
+        $data = $request->all();
+
+        //for image uploading 
+        $imagepath = null;
+
+        if ($request->hasFile(key: 'profile_picture') && $request->file(key: 'profile_picture')->isValid()) {
+            $file = $request->file(key: 'profile_picture');
+
+            //generate a unique filename
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            //move file to the public directory
+            $file->move(public_path('storage/profile'), $filename);
+
+            //save the relative path to the databse
+            $imagePath = 'storage/profile' . $filename;
+        }
+
+        $data['profile_picture'] = $imagePath;
+
+        User::create($data);
 
         return response()->json([
             'status' => 'success',
             'message' => 'New user created successfully!',
-            'user' => $user
+
         ], 201);
     }
 
@@ -96,5 +111,21 @@ class AuthController extends Controller
             'data' => $user
 
         ]);
+    }
+
+    //for the logout
+
+    public function logout()
+    {
+        $user = Auth::user();
+        $user->tokens()->delete();
+
+        return response()->json(
+            [
+                'status' => 'Success',
+                'message' => 'User deleted succesfully'
+            ],
+            200
+        );
     }
 }

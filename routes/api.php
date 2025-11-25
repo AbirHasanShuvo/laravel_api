@@ -28,4 +28,5 @@ Route::post('/login', [AuthController::class, 'login']);
 // Protected routes (require token)
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
+    Route::get('/logout', [AuthController::class, 'logout']);
 });
