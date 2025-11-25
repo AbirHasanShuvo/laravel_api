@@ -20,6 +20,12 @@ Route::apiResource('/students', StudentApiController::class);
 Route::apiResource('/peoples', PeopleApiController::class);
 
 //new routes
-Route::post('/register', [AuthController::class, 'register'])->name('register');
-//for login
-Route::post('/login', [AuthController::class, 'login'])->name('login');
+
+// Public routes (NO middleware)
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+// Protected routes (require token)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'profile']);
+});
