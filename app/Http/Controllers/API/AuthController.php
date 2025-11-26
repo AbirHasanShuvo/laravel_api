@@ -14,6 +14,52 @@ class AuthController extends Controller
     // ==============================
     // REGISTER
     // ==============================
+    // public function register(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'name' => 'required',
+    //         'email' => 'required|unique:users,email',
+    //         'password' => 'required|min:8|confirmed',
+    //         'password_confirmation' => 'required|min:8'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'status' => 'failed',
+    //             'errors' => $validator->errors()
+    //         ], 400);
+    //     }
+
+    //     $data = $request->all();
+
+    //     //for image uploading 
+    //     $imagepath = null;
+
+    //     if ($request->hasFile(key: 'profile_picture') && $request->file(key: 'profile_picture')->isValid()) {
+    //         $file = $request->file(key: 'profile_picture');
+
+    //         //generate a unique filename
+    //         $filename = time() . '_' . $file->getClientOriginalName();
+
+    //         //move file to the public directory
+    //         $file->move(public_path('storage/profile'), $filename);
+
+    //         //save the relative path to the databse
+    //         $imagePath = 'storage/profile' . $filename;
+    //     }
+
+    //     $data['profile_picture'] = $imagePath;
+
+
+    //     User::create($data);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'message' => 'New user created successfully!',
+
+    //     ], 201);
+    // }
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -30,34 +76,33 @@ class AuthController extends Controller
             ], 400);
         }
 
-        $data = $request->all();
+        // Image upload
+        $imagePath = null;
 
-        //for image uploading 
-        $imagepath = null;
-
-        if ($request->hasFile(key: 'profile_picture') && $request->file(key: 'profile_picture')->isValid()) {
-            $file = $request->file(key: 'profile_picture');
-
-            //generate a unique filename
+        if ($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()) {
+            $file = $request->file('profile_picture');
             $filename = time() . '_' . $file->getClientOriginalName();
-
-            //move file to the public directory
             $file->move(public_path('storage/profile'), $filename);
-
-            //save the relative path to the databse
-            $imagePath = 'storage/profile' . $filename;
+            $imagePath = 'storage/profile/' . $filename;
         }
 
-        $data['profile_picture'] = $imagePath;
+        // Build user data
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password), // 🔥 FIXED
+            'profile_picture' => $imagePath,
+        ];
 
+        // Create user
         User::create($data);
 
         return response()->json([
             'status' => 'success',
             'message' => 'New user created successfully!',
-
         ], 201);
     }
+
 
 
     // ==============================
@@ -91,7 +136,6 @@ class AuthController extends Controller
 
         // Sanctum token
         $token = $user->createToken('BlogApp')->plainTextToken;
-
         return response()->json([
             'status' => 'success',
             'message' => 'Login successful',
