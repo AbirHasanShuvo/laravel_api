@@ -3,16 +3,22 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 
-class BlogCategory extends Controller
+class BlogCategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $categories = BlogCategory::get();
+        return response()->json([
+            'status' => 'success',
+            'count' => count($categories),
+            'data' => $categories
+        ], 200);
     }
 
     /**

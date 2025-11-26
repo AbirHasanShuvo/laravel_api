@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 
 class BlogPostController extends Controller
@@ -10,10 +11,7 @@ class BlogPostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+    public function index() {}
 
     /**
      * Store a newly created resource in storage.
