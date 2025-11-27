@@ -26,84 +26,7 @@ class BlogPostController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'user_id' => 'required|numeric',
-    //         'catagory_id' => 'required|numeric',
-    //         'title' => 'required',
-    //         'content' => 'required',
-    //         'thumbnail' => 'nullable|image|max:2048'
 
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'status' => 'Failed',
-    //             'message' => $validator->errors()
-    //         ], 400);
-    //     }
-
-    //     //check the logged in user
-
-    //     $loggedInUser = Auth::user();
-
-    //     if ($loggedInUser != $request->user_id) {
-    //         return response()->json([
-    //             'status' => 'Failed',
-    //             'message' => 'Unauthorised access'
-    //         ], 400);
-    //     }
-
-    //     //check category is valid or not.
-
-    //     $category =  BlogCategory::find($request->category_id);
-
-    //     if (!$category) {
-    //         return response()->json([
-    //             'status' => 'Failed',
-    //             'message' => 'No category found'
-    //         ], 404);
-    //     }
-
-    //     $imagePath = null;
-
-    //     if ($request->hasFile('thumbnail') && $request->isValid()) {
-    //         $file = $request->file('thumbnail');
-
-    //         $filename = time() . '_' . $file('thumbnail');
-
-    //         //move file to the storage
-    //         $file->move(public_path('storage/posts'), $filename);
-
-    //         //save image path to the database
-    //         $imagePath = 'storage/posts/' . $filename;
-    //     }
-
-    //     //now giving the data 
-    //     $data['title'] = $request->title;
-    //     $data['slug'] = Str::slug($request->slug);
-    //     $data['user_id'] = $request->user_id;
-    //     $data['category_id'] = $request->category_id;
-    //     $data['excerpt'] = $request->excerpt;
-    //     $data['thumbnail'] = $imagePath ? $imagePath : null;
-
-    //     if (Auth::user()->role == 'admin') {
-    //         $data['status'] = 'published';
-    //         $data['published_at'] = date('Y-m-d H:i:s');
-    //     }
-
-    //     BlogPost::create($data);
-
-    //     return response()->json([
-    //         'status' => 'Success',
-    //         'message' => 'Blog post created succesfully'
-
-    //     ], status: 201);
-    // }
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -191,7 +114,127 @@ class BlogPostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+
+        //check blog post
+        $blogPost = BlogPost::find($id);
+
+        if (!$blogPost) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'No Blogpost found'
+            ]);
+        }
+
+
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|numeric',
+            'category_id' => 'required|numeric',
+            'title' => 'required',
+            'content' => 'required'
+
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => $validator->errors(),
+            ], 400);
+        }
+
+        //check if user is same as logged in user
+
+        // check logged in user
+        $loggedInUser = Auth::user();
+
+        if ($loggedInUser->id != $request->user_id) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'Unauthorised access'
+            ], 403);
+        }
+
+        // check category
+        $category = BlogCategory::find($request->category_id);
+
+        if (!$category) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'No category found'
+            ], 404);
+        }
+
+        $blogPost->category_id = $request->category_id;
+        $blogPost->user_id = $request->user_id;
+        $blogPost->title = $request->title;
+        $blogPost->slug = Str::slug($request->title);
+
+        $blogPost->content = $request->content;
+        $blogPost->excerpt =  $request->excerpt;
+        $blogPost->status =  $request->status;
+
+        $blogPost->save();
+
+        //it will update on the database
+
+        return response()->json([
+            'status' => 'Updated the blog post',
+            'message' => 'Blog post edited succesfully'
+        ], status: 201);
+    }
+
+    public function blogPostImage(Request $request, int $id)
+    {
+        //check blog post
+        $blogPost = BlogPost::find($id);
+
+        if (!$blogPost) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'No Blogpost found'
+            ]);
+        }
+
+
+        //validation checking
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|numeric',
+            'thumbnail' => 'nullable|image|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        // check logged in user
+        $loggedInUser = Auth::user();
+
+        if ($loggedInUser->id != $request->user_id) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'Unauthorised access'
+            ], 403);
+        }
+
+        // upload image
+        $imagePath = null;
+
+        if ($request->hasFile('thumbnail')) {
+            $file = $request->file('thumbnail');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('storage/posts'), $filename);
+            $imagePath = 'storage/posts/' . $filename;
+        }
+
+        $blogPost->thumbnail = isset($imagePath) ? $imagePath : $blogPost->thumbnail;
+        $blogPost->save();
+
+        return response()->json([
+            'status' => 'Succes',
+            'message' => 'Blog image updated succesfully'
+        ], 201);
     }
 
     /**
@@ -199,6 +242,20 @@ class BlogPostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $blogPost = BlogPost::find($id);
+
+        if (!$blogPost) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'No Blogpost found'
+            ], status: 404);
+        }
+
+        $blogPost->delete();
+
+        return response()->json([
+            'status' => 'Succes',
+            'message' => 'Blogpost deleted succesfully'
+        ], 201);
     }
 }

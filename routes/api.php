@@ -38,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('categories', BlogCategoryController::class);
     //for post API
     Route::apiResource('posts', BlogPostController::class,);
+    Route::post('blog-post-image/{post}', [BlogPostController::class, 'blogPostImage'])->name('blog-post-image');
 });
 
 Route::get('categories', [BlogCategoryController::class, 'index']);
