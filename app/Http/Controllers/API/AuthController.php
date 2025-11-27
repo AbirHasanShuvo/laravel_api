@@ -92,6 +92,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password), // 🔥 FIXED
             'profile_picture' => $imagePath,
+            'role' => $request->role ? $request->role : null
         ];
 
         // Create user

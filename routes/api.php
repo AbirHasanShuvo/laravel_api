@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogCategoryController;
+use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\PeopleApiController;
 use App\Http\Controllers\API\StudentApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\TestApiController;
 use App\Models\BlogCategory;
+use App\Models\BlogPost;
 use App\Models\Student;
 
 // Route::get('/user', function (Request $request) {
@@ -34,6 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Blog category routes
     Route::apiResource('categories', BlogCategoryController::class);
+    //for post API
+    Route::apiResource('posts', BlogPostController::class,);
 });
 
 Route::get('categories', [BlogCategoryController::class, 'index']);
+Route::get('posts', [BlogPostController::class, 'index'])->name('index');
