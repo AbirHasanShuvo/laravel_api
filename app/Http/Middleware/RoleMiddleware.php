@@ -31,7 +31,7 @@ class RoleMiddleware
         return response()->json(
             [
                 'status' => 'Failed',
-                'message' => 'You are not eligible for this role'
+                'message' => 'You are not eligible for perform this operation'
             ],
             status: 403
         );
