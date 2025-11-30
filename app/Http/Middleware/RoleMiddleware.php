@@ -23,17 +23,19 @@ class RoleMiddleware
             ], 403);
         }
 
-        //allow access based o roles
+        // Split roles if they were passed as a single string with |
+        if (count($roles) === 1 && str_contains($roles[0], '|')) {
+            $roles = explode('|', $roles[0]);
+        }
+
+        // Check if user role is allowed
         if (in_array(Auth::user()->role, $roles)) {
             return $next($request);
         }
 
-        return response()->json(
-            [
-                'status' => 'Failed',
-                'message' => 'You are not eligible for perform this operation'
-            ],
-            status: 403
-        );
+        return response()->json([
+            'status' => 'Failed',
+            'message' => 'You are not eligible to perform this operation'
+        ], 403);
     }
 }

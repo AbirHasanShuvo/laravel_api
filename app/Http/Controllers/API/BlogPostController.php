@@ -87,11 +87,13 @@ class BlogPostController extends Controller
 
         if ($loggedInUser->role == 'admin') {
             $data['status'] = 'published';
-            $data['published_at'] = now();
-        } else {
-            $data['status'] = 'draft';
-            $data['published_at'] = now();
         }
+        if ($loggedInUser->role == 'admin' || $loggedInUser->role == 'author')
+            $data['published_at'] = now();
+        // else {
+        //     $data['status'] = 'draft';
+        //     // $data['published_at'] = now();
+        // }
 
         BlogPost::create($data);
 
