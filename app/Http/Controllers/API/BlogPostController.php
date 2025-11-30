@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
+use App\Models\Seo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -17,7 +18,10 @@ class BlogPostController extends Controller
      */
     public function index()
     {
-        $posts = BlogPost::get();
+        // $posts = BlogPost::get();
+        //here i also want data from the table name SEO
+
+        $posts = BlogPost::with('seo_data')->get();
 
         return response()->json([
             'status' => 'Succes',
@@ -34,7 +38,11 @@ class BlogPostController extends Controller
             'category_id' => 'required|numeric',
             'title' => 'required',
             'content' => 'required',
-            'thumbnail' => 'nullable|image|max:2048'
+            'thumbnail' => 'nullable|image|max:2048',
+            'meta_title' => 'required',
+            'meta_description' => 'required',
+            'meta_keywords' => 'required'
+
         ]);
 
         if ($validator->fails()) {
@@ -95,7 +103,19 @@ class BlogPostController extends Controller
         //     // $data['published_at'] = now();
         // }
 
-        BlogPost::create($data);
+        //here editing for the SEO
+
+
+        $blogPost = BlogPost::create($data);
+
+        $postId = $blogPost->id;
+
+        $seoData['post_id'] = $postId;
+        $seoData['meta_title'] = $request->meta_title;
+        $seoData['meta_description'] = $request->meta_description;
+        $seoData['meta_keywords'] = $request->meta_keywords;
+
+        Seo::create($seoData);
 
         return response()->json([
             'status' => 'Success',
@@ -253,11 +273,20 @@ class BlogPostController extends Controller
             ], status: 404);
         }
 
-        $blogPost->delete();
+        $loggedInUser = Auth::user();
 
-        return response()->json([
-            'status' => 'Succes',
-            'message' => 'Blogpost deleted succesfully'
-        ], 201);
+        if ($loggedInUser->id == $blogPost->user_id || Auth::user()->role == 'admin') {
+            $blogPost->delete();
+
+            return response()->json([
+                'status' => 'Succes',
+                'message' => 'Blogpost deleted succesfully'
+            ], 201);
+        } else {
+            return response()->json([
+                'status' => 'Fail',
+                'message' => 'You are not allowed to perform this task'
+            ], 403);
+        }
     }
 }
