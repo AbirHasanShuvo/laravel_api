@@ -152,7 +152,10 @@ class BlogPostController extends Controller
             'user_id' => 'required|numeric',
             'category_id' => 'required|numeric',
             'title' => 'required',
-            'content' => 'required'
+            'content' => 'required',
+            'meta_title' => 'required',
+            'meta_description' => 'required',
+            'meta_keywords' => 'required'
 
         ]);
 
@@ -185,23 +188,39 @@ class BlogPostController extends Controller
             ], 404);
         }
 
-        $blogPost->category_id = $request->category_id;
-        $blogPost->user_id = $request->user_id;
-        $blogPost->title = $request->title;
-        $blogPost->slug = Str::slug($request->title);
+        if ($loggedInUser->id == $blogPost->user_id || Auth::user()->role == 'admin') {
+            $blogPost->category_id = $request->category_id;
+            $blogPost->user_id = $request->user_id;
+            $blogPost->title = $request->title;
+            $blogPost->slug = Str::slug($request->title);
+            $blogPost->content = $request->content;
+            $blogPost->excerpt =  $request->excerpt;
+            $blogPost->status =  $request->status;
+            $blogPost->save();
 
-        $blogPost->content = $request->content;
-        $blogPost->excerpt =  $request->excerpt;
-        $blogPost->status =  $request->status;
+            //it will update on the database
 
-        $blogPost->save();
+            //then from the SEO 
 
-        //it will update on the database
+            $seoData = Seo::where('post_id', $blogPost->id)->first();
+            $seoData->meta_title = $request->meta_title;
+            $seoData->meta_description = $request->meta_description;
+            $seoData->meta_keywords = $request->meta_keywords;
 
-        return response()->json([
-            'status' => 'Updated the blog post',
-            'message' => 'Blog post edited succesfully'
-        ], status: 201);
+            $seoData->save();
+            //this will update the seo info to the database table
+
+
+            return response()->json([
+                'status' => 'Updated the blog post',
+                'message' => 'Blog post edited succesfully'
+            ], status: 201);
+        } else {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'You are not allowed to perform this task'
+            ], 403);
+        }
     }
 
     public function blogPostImage(Request $request, int $id)
