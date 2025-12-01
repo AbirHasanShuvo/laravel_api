@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CommentController extends Controller
 {
@@ -20,7 +22,31 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'post_id' => 'required|integer|exists:blog_posts,id',
+            // 'user_id' => 'required|integer',
+            'content' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        $data['post_id'] = $request->post_id;
+        $data['user_id'] = auth()->id();
+        $data['content'] = $request->content;
+
+        Comment::create($data);
+
+        //it will create a new record in the database
+
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Comment added & waiting for admin approval'
+        ], 201);
     }
 
     /**

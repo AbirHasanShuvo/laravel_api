@@ -88,6 +88,18 @@ class LikeController extends Controller
         // TODO: Store the like/dislike record for the user and post
     }
 
+    public function reactions(Request $request, $postId)
+    {
+        $likesCount = Like::where('post_id', $postId)->where('status', 1)->count();
+        $dislikesCount = Like::where('post_id', $postId)->where('status', 2)->count();
+
+        return response()->json([
+            'likes' => $likesCount,
+            'dislikes' => $dislikesCount,
+            'post_id' => $postId
+        ], 200);
+    }
+
     /**
      * Display the specified resource.
      */
