@@ -47,10 +47,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/post/react', [LikeController::class, 'store'])->name('react');
     //for commenting
 
+
+
+    // Route::post('/comments', [CommentController::class, 'store']);]
+    Route::get('comments', [CommentController::class, 'index'])->name('index')->middleware(['role:admin']);
+    Route::post('comments/change-status', [CommentController::class, 'changeStatus'])->name('changeStatus')->middleware('role:admin');
     Route::apiResource('comments', CommentController::class);
-    // Route::post('/comments', [CommentController::class, 'store']);
 });
 
 Route::get('categories', [BlogCategoryController::class, 'index']);
 Route::get('posts', [BlogPostController::class, 'index'])->name('index');
 Route::get('post/reactions/{post}', [LikeController::class, 'reactions'])->name('reactions');
+Route::get('/comments/{post}', [CommentController::class, 'show'])->name('show');

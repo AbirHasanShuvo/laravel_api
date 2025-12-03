@@ -56,12 +56,77 @@ class CommentController extends Controller
         ], 201);
     }
 
+    //change comment status
+    public function changeStatus(Request $request)
+    {
+        //validate input
+
+        $validator = Validator::make($request->all(), [
+            'comment_id' => 'required|exists:comments,id',
+            'status' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        $comment = Comment::find($request->comment_id);
+        $comment->status = $request->status;
+        $comment->save();
+
+        return response()->json([
+            'status' => 'Success',
+            'message' => 'Comment status changes successfully'
+        ]);
+    }
+
+    //updated one 
+
+    // public function changeStatus(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'status' => 'required'
+    //     ]);
+
+    //     $comment = Comment::findOrFail($id);
+    //     $comment->status = $request->status;
+    //     $comment->save();
+
+    //     return response()->json([
+    //         'status' => 'Success',
+    //         'message' => 'Comment status changed successfully'
+    //     ]);
+    // }
+
+
+
+
+
+
+
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        $comments = Comment::where('post_id', $id)->get();
+
+        if ($comments) {
+            return response()->json([
+                'status' => 'Success',
+                'count' => count($comments),
+                'data' => $comments
+
+            ], status: 200);
+        } else {
+            return response()->json([
+                'status' => 'Failed',
+                'message' => 'No comments found for this post'
+            ]);
+        }
     }
 
     /**
