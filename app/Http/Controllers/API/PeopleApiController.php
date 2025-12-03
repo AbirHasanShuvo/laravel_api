@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PeopleApiController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $peoples = People::get();

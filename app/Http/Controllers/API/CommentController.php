@@ -14,7 +14,14 @@ class CommentController extends Controller
      */
     public function index()
     {
-        //
+        $comments = Comment::get();
+
+        return response()->json([
+            'status' => 'Success',
+            'count' => count($comments),
+            'data' => $comments
+
+        ], status: 200);
     }
 
     /**
@@ -36,7 +43,7 @@ class CommentController extends Controller
         }
 
         $data['post_id'] = $request->post_id;
-        $data['user_id'] = auth()->id();
+        $data['user_id'] = auth()->id(); // Get the authenticated user's ID
         $data['content'] = $request->content;
 
         Comment::create($data);
