@@ -112,7 +112,7 @@ class CommentController extends Controller
      */
     public function show(string $id)
     {
-        $comments = Comment::where('post_id', $id)->get();
+        $comments = Comment::where('post_id', $id)->where('status', 'approved')->get();
 
         if ($comments) {
             return response()->json([
