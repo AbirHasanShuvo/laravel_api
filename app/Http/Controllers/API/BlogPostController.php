@@ -200,7 +200,7 @@ class BlogPostController extends Controller
 
             //it will update on the database
 
-            //then from the SEO 
+            //then from the SEO
 
             $seoData = Seo::where('post_id', $blogPost->id)->first();
             $seoData->meta_title = $request->meta_title;
